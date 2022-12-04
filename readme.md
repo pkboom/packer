@@ -17,8 +17,11 @@ https://developer.hashicorp.com/packer/plugins/builders/amazon/ebs
 
 - Min version: in case you use specific features that require a certain version of Packer (I rarely use this)
 - Variables: User-defined variables. They can have a value, or can be empty (in which case you can add the value using the CLI when calling Packer)
+
 - Builders: Define what providers to use as builders (We'll use amazon-ebs to create a AMI we can use for launching ec2 instances)
+
 - Provisioners: Essentially the scripts we run on the server to set everything up the way we want it
+
 - We could simply tell Packer that directly via "source_ami":"ami-07c1207a9d40bc3bd", but we'll instead use a filter to find the latest AMI for our use case.
 
 - We'll use the (standard) Packer Builder amazon-ebs. You can see all available [builders here](https://developer.hashicorp.com/packer/plugins/builders/amazon).
