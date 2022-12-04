@@ -18,6 +18,9 @@ Here's how you make an AMI in AWS:
 1. Convert that snapshot to an AMI
 
 - We'll ask Packer to use a filter (using the AWS API) to find the latest Ubuntu 20.04 AMI created by Canonical.
+
 - We tell Packer how base image to use and how to create it (giving it an 8gb EBS drive, for example).
+
 - We also tell Packer to give the AMI we create some tags to be applied when it is created.
+
 - Tagging resources is super important in AWS to help search for resources, segment them (e.g. by environment), and for cost allocation and reporting.
