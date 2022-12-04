@@ -12,9 +12,7 @@
 Here's how you make an AMI in AWS:
 
 1. Create a server with an EBS root drive
-
-- EBS (Elastic Block Storage) are the disk drives in AWS
-
+   - EBS (Elastic Block Storage) are the disk drives in AWS
 1. Install and configure the server however you'd like
 1. Create a snapshot of the EBS root volume
 1. Convert that snapshot to an AMI
