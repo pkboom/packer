@@ -6,6 +6,14 @@ packer build cloudcasts.json
 packer build -var "infra_env=staging" cloudcasts.json
 packer validate -var "infra_env=staging" -var "vault_pass=<vault-pass>" cloudcasts.json
 packer build -var "infra_env=staging" -var "vault_pass=<vault-pass>" cloudcasts.json
+
+# run the above Ansible provisioner in Packer with
+ANSIBLEPW=`cat .vault` # pass the content of .vault to ANSIBLEPW
+
+packer build \
+    -var "infra_env=staging" \
+    -var "vault_pass=$ANSIBLEPW" \
+    cloudcasts-app.json
 ```
 
 # Provisioners
@@ -18,6 +26,7 @@ https://developer.hashicorp.com/packer/docs/provisioners/shell
 https://developer.hashicorp.com/packer/plugins/builders/amazon/ebs
 
 - Min version: in case you use specific features that require a certain version of Packer (I rarely use this)
+
 - Variables: User-defined variables. They can have a value, or can be empty (in which case you can add the value using the CLI when calling Packer)
 
 - Builders: Define what providers to use as builders (We'll use amazon-ebs to create a AMI we can use for launching ec2 instances)
