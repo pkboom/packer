@@ -26,6 +26,10 @@
     chdir: /etc
   ignore_errors: yes
 
+# https://www.linode.com/docs/guides/how-to-configure-nginx/
+# Installation from official NGINX repository: include directive is include
+# /etc/nginx/conf.d/*.conf;. Every website you host with NGINX gets it’s
+# own configuration file in /etc/nginx/conf.d/, with names formatted as example.com.conf.
 - name: Add Nginx configuration
   copy:
     src: cloudcasts.io.conf
