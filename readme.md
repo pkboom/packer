@@ -15,8 +15,3 @@ packer build \
     -var "vault_pass=$ANSIBLEPW" \
     cloudcasts-app.json
 ```
-
-# Provisioners
-
-https://developer.hashicorp.com/packer/docs/provisioners
-https://developer.hashicorp.com/packer/docs/provisioners/shell

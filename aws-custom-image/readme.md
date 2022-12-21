@@ -35,3 +35,8 @@ Here's how you make an AMI in AWS:
 - Tagging resources is super important in AWS to help search for resources, segment them (e.g. by environment), and for cost allocation and reporting.
 
 - launch_block_device_mappings > volume_size: set it to minimum. You can make it larger later for servers based off of this image
+
+# Provisioners
+
+https://developer.hashicorp.com/packer/docs/provisioners
+https://developer.hashicorp.com/packer/docs/provisioners/shell
