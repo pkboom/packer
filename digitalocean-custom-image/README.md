@@ -17,9 +17,9 @@ ansible-playbook playbook.yml --check # validate
 packer build .
 ```
 
-> When creating a droplet, set up below
+> When creating a droplet, set up below.
 
-> <image width="500" src="additional_options.png">
+<image width="500" src="additional_options2.png">
 
 # doctl Command Line Interface (CLI)
 
