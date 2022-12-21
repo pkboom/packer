@@ -1,6 +1,10 @@
 ---
 # playbook.yml
 - name: "Provision Image"
+  # https://ansible-docs.readthedocs.io/zh/stable-2.0/rst/playbooks_intro.html#hosts-and-users
+  # The hosts line is a list of one or more groups or host patterns.
+  # hosts: localhost
+  # hosts: all # every server in etc/ansible/hosts
   hosts: default # use the host that we run this in.
   # https://ansible-docs.readthedocs.io/zh/stable-2.0/rst/become.html
   # When become = yes and become_user is not mentioned
@@ -20,7 +24,7 @@
         url: https://apt.releases.hashicorp.com/gpg
         state: present
 
-    # sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com focal main
+    # sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main
     - name: Add Hashicorp Repos
       apt_repository:
         repo: deb https://apt.releases.hashicorp.com focal main
@@ -30,6 +34,8 @@
       apt:
         name: "{{ item }}"
         state: present
+        # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html#parameter-update_cache
+        # === apt-get update
         update_cache: true
       loop:
         - nginx
