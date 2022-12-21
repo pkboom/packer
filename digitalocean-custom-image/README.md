@@ -17,7 +17,7 @@ ansible-playbook playbook.yml --check # validate
 packer build .
 ```
 
-> When creating a droplet, set up below.
+> When creating an image based on your server, this might help.
 
 <image width="500" src="additional_options2.png">
 
