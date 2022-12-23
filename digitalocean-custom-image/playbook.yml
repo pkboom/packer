@@ -1,5 +1,4 @@
 ---
-# playbook.yml
 - name: "Provision Image"
   # https://ansible-docs.readthedocs.io/zh/stable-2.0/rst/playbooks_intro.html#hosts-and-users
   # The hosts line is a list of one or more groups or host patterns.

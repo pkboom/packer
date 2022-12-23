@@ -1,0 +1,61 @@
+---
+- name: Install Server Basics
+  apt:
+    pkg: [
+        "software-properties-common",
+        # automatically install updated packages
+        "unattended-upgrades",
+        # synchronize computer system clocks automatically over a network.
+        "ntp",
+        "wget",
+        "curl",
+        "vim",
+        "silversearcher-ag",
+        "git",
+        "unzip",
+        "htop",
+        "tmux",
+        "pigz",
+        "jq",
+      ]
+    state: present
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html#parameter-update_cache
+    # === apt-get update
+    update_cache: true
+  notify:
+    - Start NTP
+
+# https://docs.digitalocean.com/reference/doctl/how-to/install
+- name: Download doctl
+  unarchive:
+    src: https://github.com/digitalocean/doctl/releases/download/v1.91.0/doctl-1.91.0-linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+    mode: 0755
+
+- name: Copy doctl
+  copy: remote_src=yes
+  src: /temp/doctl
+  dest: /usr/local/bin
+
+- name: Remove doctl
+  file: path=/temp/doctl
+  state: absent
+
+# Decides how often to update
+- name: Add Periodic Configuration
+  copy:
+    src: 10periodic
+    dest: /etc/apt/apt.conf.d/10periodic
+    owner: root
+    group: root
+
+# Decides what to update
+- name: Add Unattended Upgrade Configuration
+  copy:
+    src: 50unattended-upgrades
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+  notify:
+    - Restart Unattended Upgrades

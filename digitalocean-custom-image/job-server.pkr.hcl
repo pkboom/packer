@@ -22,11 +22,15 @@ build {
     sources = [
         "source.digitalocean.ubuntu"
     ]
-
     // https://developer.hashicorp.com/packer/docs/templates/hcl_templates/blocks/build/provisioner
     // https://developer.hashicorp.com/packer/docs/provisioners
+    provisioner "shell" {
+        // scripts = fileset(".", "scripts/{install,secure}.sh")
+        scripts= [
+            "scripts/base.sh"
+        ]
+    }
     provisioner "ansible" {
-        playbook_file = "./playbook.yml"
-        //extra_arguments = ["-vvvv"]
+      playbook_file = "./playbook.yml"
     }
 }
