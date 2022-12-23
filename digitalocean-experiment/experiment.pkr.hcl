@@ -24,11 +24,11 @@ build {
   sources = [
     "source.digitalocean.experiment"
   ]
-  // provisioner "shell"{
-  //   scripts = [
-  //     "${path.cwd}/scripts/base.sh"
-  //   ]
-  // }
+  provisioner "shell"{
+    scripts = [
+      "./scripts/base.sh"
+    ]
+  }
   provisioner "ansible" {
     playbook_file = "./ansible/app.yml"
   }

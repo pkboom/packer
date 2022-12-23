@@ -6,7 +6,7 @@ variable "infra_name" {
 
 variable "infra_type" {
     type        = string
-    default     = "production"
+    default     = "web"
     description = "environment of development"
 }
 

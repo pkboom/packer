@@ -29,18 +29,17 @@
 - name: Download doctl
   unarchive:
     src: https://github.com/digitalocean/doctl/releases/download/v1.91.0/doctl-1.91.0-linux-amd64.tar.gz
-    dest: /tmp
+    dest: /usr/local/bin
     remote_src: yes
     mode: 0755
 
-- name: Copy doctl
-  copy: remote_src=yes
-  src: /temp/doctl
-  dest: /usr/local/bin
+# - name: List doctl
+#   command: ls /temp
 
-- name: Remove doctl
-  file: path=/temp/doctl
-  state: absent
+# # command module
+# # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html#examples
+# - name: Move doctl
+#   command: mv /temp/doctl /usr/local/bin
 
 # Decides how often to update
 - name: Add Periodic Configuration
