@@ -7,10 +7,15 @@ variable "infra_name" {
 variable "infra_type" {
     type        = string
     default     = "web"
-    description = "environment of development"
+    description = "type of development"
 }
 
 variable "api_token" {
+    type        = string
+    sensitive  = true
+}
+
+variable "admin_password" {
     type        = string
     sensitive  = true
 }

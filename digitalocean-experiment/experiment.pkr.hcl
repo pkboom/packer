@@ -31,5 +31,8 @@ build {
   }
   provisioner "ansible" {
     playbook_file = "./ansible/app.yml"
+    extra_arguments = [
+      "--extra-vars", "admin_password=${var.admin_password}"
+    ]
   }
 }

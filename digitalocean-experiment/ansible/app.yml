@@ -3,6 +3,8 @@
   become: true
   roles:
     - base
+    - faker
+    # - user
     # - php
     # - nginx
     # - app
