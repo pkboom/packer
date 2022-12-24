@@ -1,7 +1,13 @@
 ---
 - name: Create Admin User
-  user: name=admin
-    password={{ admin_password }}
-    group=sudo
-    append=true
-    shell=/bin/bash
+  user:
+    name: admin
+    password: "{{ admin_password }}"
+    groups: sudo
+    append: true # add the user to group `sudo`
+    shell: /bin/bash
+
+- name: Prints password
+  debug:
+    msg:
+      - "The password: {{ admin_password }}"
