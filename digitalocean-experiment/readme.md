@@ -30,6 +30,14 @@ ssh -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=no admin@68.183.207.
 # authentication failures before prompting for password.
 ```
 
+# Remove a key
+
+```sh
+ssh-keygen -R <host>
+
+ssh-keygen -R 165.22.237.44
+```
+
 # Ping
 
 ```sh
@@ -52,7 +60,7 @@ ansible-vault edit ansible/roles/user/vars/main.yml
 - [x] doctl file exist in /usr/local/bin
 - [x] what groups a sudo belongs to
 - [x] ping - how it works
-- [ ] ssh with key
+- [x] ssh with key
 - [ ] git pull for web
 - [ ] install app and set up
 - [ ] install mysql set up
