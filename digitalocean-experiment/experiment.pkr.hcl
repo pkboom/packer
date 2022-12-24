@@ -14,7 +14,7 @@ source "digitalocean" "experiment"{
   size = "s-1vcpu-1gb"
   image = "ubuntu-20-04-x64"
   ssh_username = "root" // default username for ubuntu
-  snapshot_name = "${var.infra_name}_${var.infra_type}_${formatdate("YYYY_MM_DD_hh_mm", timestamp())}"
+  snapshot_name = "${var.infra-name}-${var.infra-type}-${formatdate("YYYY-MM-DD-hh-mm", timestamp())}"
 }
 
 // https://developer.hashicorp.com/packer/docs/templates/hcl_templates/blocks/build
@@ -32,6 +32,15 @@ build {
     playbook_file = "./ansible/app.yml"
     extra_arguments = [
       "--extra-vars", "admin_password=${var.admin_password}"
+    ]
+  }
+  post-processor "shell-local" {
+    inline = [
+      "echo go to digitalocean to ip address",
+      "echo https://cloud.digitalocean.com/droplets"
+    ]
+    scripts = [
+      "./scripts/post.sh"
     ]
   }
 }

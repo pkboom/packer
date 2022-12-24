@@ -17,5 +17,5 @@ variable "api_token" {
 
 variable "admin_password" {
     type        = string
-    // sensitive  = true
+    sensitive  = true
 }
