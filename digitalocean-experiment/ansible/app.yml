@@ -2,9 +2,8 @@
 - hosts: default
   become: true
   roles:
-    - base
-    - faker
-    # - user
+    # - base
+    - user
     # - php
     # - nginx
     # - app

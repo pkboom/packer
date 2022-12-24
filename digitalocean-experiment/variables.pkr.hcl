@@ -19,3 +19,8 @@ variable "admin_password" {
     type        = string
     sensitive  = true
 }
+
+variable "deploy_password" {
+    type        = string
+    sensitive  = true
+}

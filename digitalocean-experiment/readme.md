@@ -4,7 +4,9 @@ https://docs.digitalocean.com/reference/doctl/how-to/install/
 
 ```sh
 packer validate -var-file="variables.pkrvars.hcl" .
+
 packer init -var-file="variables.pkrvars.hcl" .
+
 packer build -var-file="variables.pkrvars.hcl" .
 ```
 
@@ -28,9 +30,28 @@ ssh -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=no admin@68.183.207.
 # authentication failures before prompting for password.
 ```
 
+# Ping
+
+```sh
+ansible all -m ping -u admin
+
+ansible -k all -m ping -u vagrant
+# -k: ask for password
+# -u: log in as user
+```
+
+# Ansible Vault
+
+```sh
+ansible-vault create ansible/roles/user/vars/main.yml
+New Vault password:
+
+ansible-vault edit ansible/roles/user/vars/main.yml
+```
+
 - [x] doctl file exist in /usr/local/bin
 - [x] what groups a sudo belongs to
-- [ ] input ip address for post.sh
+- [x] ping - how it works
 - [ ] ssh with key
 - [ ] git pull
 - [ ] install app and set up
