@@ -53,7 +53,7 @@ ansible-vault edit ansible/roles/user/vars/main.yml
 - [x] what groups a sudo belongs to
 - [x] ping - how it works
 - [ ] ssh with key
-- [ ] git pull
+- [ ] git pull for web
 - [ ] install app and set up
 - [ ] install mysql set up
 - [ ] set up nginx
