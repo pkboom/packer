@@ -65,4 +65,3 @@ ansible-vault edit ansible/roles/user/vars/main.yml
 - [ ] install app and set up
 - [ ] install mysql set up
 - [ ] set up nginx
-- [ ] set up TLS certificates

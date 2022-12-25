@@ -57,12 +57,8 @@ New Vault password:
 ansible-vault edit ansible/roles/user/vars/main.yml
 ```
 
-- [x] doctl file exist in /usr/local/bin
-- [x] what groups a sudo belongs to
-- [x] ping - how it works
-- [x] ssh with key
+- [ ] set up SSL certificates
 - [ ] git pull for web
 - [ ] install app and set up
 - [ ] install mysql set up
 - [ ] set up nginx
-- [ ] set up TLS certificates
