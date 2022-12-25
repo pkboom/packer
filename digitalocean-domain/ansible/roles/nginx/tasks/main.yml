@@ -5,11 +5,6 @@
     state: present
     update_cache: true
 
-- name: Stop Nginx
-  service:
-    name: nginx
-    state: stopped
-
 - name: Check if H5BP is already installed
   stat:
     path: /etc/nginx/h5bp
