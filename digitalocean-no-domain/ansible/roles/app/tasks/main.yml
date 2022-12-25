@@ -1,0 +1,26 @@
+---
+- name: Ensure app dir exists
+  file:
+    path: /var/www/experiment.com
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Ensure web root exists
+  file:
+    path: /var/www/experiment.com/public
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Add PHP file
+  copy:
+    src: index.php
+    dest: /var/www/experiment.com/public/index.php
+    owner: www-data
+    group: www-data
+
+- name: Reload Nginx
+  service:
+    name: nginx
+    state: reloaded
