@@ -1,0 +1,7 @@
+# this is not being used in tasks/main.yml. 
+# it is just for reference.
+user www-data www-data;
+worker_processes {{ ansible_processor_cores }};
+pid /var/run/nginx.pid;
+
+# other configuations...

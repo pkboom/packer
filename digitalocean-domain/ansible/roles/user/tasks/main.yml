@@ -1,0 +1,38 @@
+---
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
+# These Tasks use the user module to create new users,
+# passing in the passwords set in the Variable file.
+- name: Create Admin User
+  user:
+    name: admin
+    password: "{{ admin_password | password_hash('sha512') }}"
+    # Defines the primary group for the user
+    groups: sudo
+    append: true # add the user to group `sudo`
+    shell: /bin/bash
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/posix/authorized_key_module.html
+# Add the SSH public key
+- name: Add Admin Authorized Key
+  authorized_key:
+    user: admin
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - ~/.ssh/id_ed25519.pub
+
+- name: Create Deploy User
+  user:
+    name: deploy
+    password: "{{ deploy_password | password_hash('sha512') }}"
+    groups: www-data
+    append: true
+    shell: /bin/bash
+
+- name: Add Deployer Authorized Key
+  authorized_key:
+    user: deploy
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - ~/.ssh/id_ed25519.pub
