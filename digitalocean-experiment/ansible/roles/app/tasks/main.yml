@@ -1,14 +1,14 @@
 ---
 - name: Ensure app dir exists
   file:
-    path: /var/www/cloudcasts.io
+    path: /var/www/experiment.com
     state: directory
     owner: www-data
     group: www-data
 
 - name: Ensure web root exists
   file:
-    path: /var/www/cloudcasts.io/public
+    path: /var/www/experiment.com/public
     state: directory
     owner: www-data
     group: www-data
@@ -16,7 +16,7 @@
 - name: Add PHP file
   copy:
     src: index.php
-    dest: /var/www/cloudcasts.io/public/index.php
+    dest: /var/www/experiment.com/public/index.php
     owner: www-data
     group: www-data
 
@@ -32,8 +32,8 @@
 # own configuration file in /etc/nginx/conf.d/, with names formatted as example.com.conf.
 - name: Add Nginx configuration
   copy:
-    src: cloudcasts.io.conf
-    dest: /etc/nginx/conf.d/cloudcasts.io.conf
+    src: experiment.com.conf
+    dest: /etc/nginx/conf.d/experiment.com.conf
     owner: root
     group: root
 
