@@ -1,9 +1,0 @@
----
-- hosts: default
-  become: true
-  roles:
-    # - base
-    - user
-    # - php
-    # - nginx
-    # - app

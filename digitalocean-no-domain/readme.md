@@ -21,7 +21,7 @@ yamldecode(file("/Users/keunbae/Library/Application Support/doctl/config.yaml"))
 # SSH into new server
 
 ```sh
-ssh -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=no admin@68.183.207.241
+ssh -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=no admin@<host>
 # -o: options
 # UserKnownHostsFile parameter specifies the database file to use for storing the user host keys (default is ~/.ssh/known_hosts)
 # UserKnownHostsFile=/dev/null: store user host keys in /dev/null, meaning discard it.
