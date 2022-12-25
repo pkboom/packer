@@ -58,5 +58,5 @@
 
 - name: Restart PHP-FPM
   service:
-    name: php8.2-fpm
+    name: php-fpm
     state: restarted

@@ -20,7 +20,7 @@ source "digitalocean" "this"{
 
 // https://developer.hashicorp.com/packer/docs/templates/hcl_templates/blocks/build
 build {
-  name = "developer-environment"
+  name = var.infra_name
   sources = [
     "source.digitalocean.this"
   ]
