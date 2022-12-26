@@ -7,7 +7,7 @@
     name: admin
     password: "{{ admin_password | password_hash('sha512') }}"
     # Defines the primary group for the user
-    groups: sudo
+    groups: admin
     append: true # add the user to group `sudo`
     shell: /bin/bash
 

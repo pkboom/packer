@@ -7,7 +7,7 @@
     name: admin
     password: "{{ admin_password | password_hash('sha512') }}"
     # Defines the primary group for the user
-    groups: sudo
+    groups: admin
     append: true # add the user to group `sudo`
     shell: /bin/bash
 
@@ -36,3 +36,10 @@
     key: "{{ item }}"
   with_file:
     - ~/.ssh/id_ed25519.pub
+
+- name: "Allow admin user to sudo without a password"
+  lineinfile:
+    dest: "/etc/sudoers"
+    state: "present"
+    regexp: "^%admin"
+    line: "%admin ALL=(ALL) NOPASSWD: ALL"
