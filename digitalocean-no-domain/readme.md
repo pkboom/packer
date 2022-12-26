@@ -60,7 +60,6 @@ ansible-vault edit ansible/roles/user/vars/main.yml
 - [x] doctl file exist in /usr/local/bin
 - [x] what groups a sudo belongs to
 - [x] ping - how it works
-- [x] ssh with key
 - [ ] git pull for web
 - [ ] install app and set up
 - [ ] install mysql set up
