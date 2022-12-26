@@ -6,3 +6,16 @@
     update_cache: true
   notify:
     - Start Nginx
+
+- name: Remove default Nginx configurations
+  command: rm -f sites-available/default
+  args:
+    chdir: /etc/nginx
+  ignore_errors: yes
+
+- name: Add Nginx configuration
+  copy:
+    src: default
+    dest: "/etc/nginx/sites-available/default"
+    owner: root
+    group: root

@@ -2,8 +2,8 @@
 - hosts: default
   become: true
   roles:
-    # - base
+    - base
+    - nginx
+    - php
     - user
-    # - php
-    # - nginx
-    # - app
+    - app

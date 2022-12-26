@@ -26,14 +26,13 @@
     chdir: /etc
   ignore_errors: yes
 
-# https://www.linode.com/docs/guides/how-to-configure-nginx/
-# Installation from official NGINX repository:
-# include directive is include /etc/nginx/conf.d/*.conf;.
-# Every website you host with NGINX gets it’s own configuration file
-# in /etc/nginx/conf.d/, with names formatted as example.com.conf.
+# https://github.com/h5bp/server-configs-nginx
+# conf.d/: This directory should contain all the server definitions.
+# Except if they are dot prefixed or non .conf extension,
+# all files in this folder are loaded automatically.
 - name: Add Nginx configuration
-  copy:
-    src: "{{ domain }}.conf"
+  template:
+    src: "{{ domain }}.j2"
     dest: "/etc/nginx/conf.d/{{ domain }}.conf"
     owner: root
     group: root
