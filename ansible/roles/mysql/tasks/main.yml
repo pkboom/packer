@@ -1,0 +1,94 @@
+---
+- name: Installing mysql
+  apt:
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - mysql-server
+    # Need this for community.mysql.mysql_user module.
+    - python3-mysqldb
+
+- name: start and enable mysql service
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+# when loggin in as root, this is used.
+- name: create root .my.cnf config file
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
+
+# mysql_secure_installation down from here
+- name: Sets the root password
+  mysql_user:
+    user: root
+    password: "{{ mysql_root_password }}"
+    host: localhost
+  no_log: yes
+
+- name: Secures the MySQL root user for localhost domain (localhost)
+  mysql_user:
+    user: "root"
+    password: "{{ mysql_root_password }}"
+    state: present
+  no_log: yes
+
+- name: Secures the MySQL root user for IPV6 localhost (::1)
+  mysql_user:
+    user: "root"
+    password: "{{ mysql_root_password }}"
+    host: "::1"
+  no_log: yes
+
+- name: Secures the MySQL root user for IPV4 localhost (127.0.0.1)
+  mysql_user:
+    user: "root"
+    password: "{{ mysql_root_password }}"
+    host: "127.0.0.1"
+  no_log: yes
+
+- name: Secures the MySQL root user for localhost domain (localhost)
+  mysql_user:
+    user: "root"
+    password: "{{ mysql_root_password }}"
+    host: "localhost"
+  no_log: yes
+
+- name: Deletes anonymous MySQL user
+  mysql_user:
+    user: ""
+    state: "absent"
+
+- name: Removes the MySQL test database
+  mysql_db:
+    db: test
+    state: absent
+
+- name: creating mysql user
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: "*.*:ALL"
+    host: "%"
+    state: present
+  # no_log: yes
+
+- name: creating db
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+
+- name: Enable remote login to mysql
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: "^bind-address"
+    line: "bind-address = 0.0.0.0"
+    backup: yes
+  notify:
+    - Restart mysql

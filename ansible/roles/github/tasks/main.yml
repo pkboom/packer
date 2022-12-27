@@ -1,0 +1,25 @@
+---
+- name: Remove home
+  command: rm -rf /var/www
+  ignore_errors: yes
+
+- name: Clone from github
+  command: "{{ item }}"
+  args:
+    chdir: /var/www
+  with_items:
+    - git clone {{ repository }} {{ domain }}
+    - cd {{ domain }}
+    - composer install
+    - npm install
+    - copy '.env.example' '.env'
+    - php artisan key:generate
+    - php artisan migrate
+    - npm run dev
+
+- name: Configure db
+  lineinfile:
+    dest: "/var/www/{{ domain }}/.env"
+    state: "present"
+    regexp: "^DB_DATABASE"
+    line: "DB_DATABASE={{ db_name }}"
