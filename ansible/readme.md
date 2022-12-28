@@ -21,6 +21,6 @@ Command offers you more security (or more so-called, isolation). In other words,
 
 Whereas, shell is very similar to executing commands as yourself on a terminal.
 
-- [ ] install mysql : see how root is created in mysql
+- [ ] git clone: file, folder permission, who should git clone?
 - [ ] install various stuff
 - [ ] pull from github

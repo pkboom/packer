@@ -1,25 +1,52 @@
 ---
 - name: Remove home
-  command: rm -rf /var/www
-  ignore_errors: yes
+  shell: rm -rf www/*
+  args:
+    chdir: /var
 
-- name: Clone from github
-  command: "{{ item }}"
+- name: Clone and set up
+  shell: git clone {{ repository }} {{ domain }}
   args:
     chdir: /var/www
-  with_items:
-    - git clone {{ repository }} {{ domain }}
-    - cd {{ domain }}
-    - composer install
-    - npm install
-    - copy '.env.example' '.env'
-    - php artisan key:generate
-    - php artisan migrate
-    - npm run dev
 
-- name: Configure db
+- name: Clone and set up
+  shell: |
+    composer install
+    # copy '.env.example' '.env'
+    # npm install
+    # php artisan key:generate
+    # npm run dev
+  args:
+    chdir: /var/www/{{ domain }}
+  register: command_output
+
+- debug:
+    var: command_output.stdout_lines
+
+- name: Configure DB_DATABASE
   lineinfile:
     dest: "/var/www/{{ domain }}/.env"
     state: "present"
     regexp: "^DB_DATABASE"
     line: "DB_DATABASE={{ db_name }}"
+
+- name: Configure DB_USERNAME
+  lineinfile:
+    dest: "/var/www/{{ domain }}/.env"
+    state: "present"
+    regexp: "^DB_USERNAME"
+    line: "DB_USERNAME={{ db_user }}"
+
+- name: Configure db
+  lineinfile:
+    dest: "/var/www/{{ domain }}/.env"
+    state: "present"
+    regexp: "^DB_PASSWORD"
+    line: "DB_PASSWORD={{ db_password }}"
+
+- name: Migrate
+  command: "{{ item }}"
+  args:
+    chdir: "/var/www/{{ domain }}"
+  with_items:
+    - php artisan migrate
