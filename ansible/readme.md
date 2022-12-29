@@ -1,7 +1,7 @@
 > **Note**
 > Edit /etc/ansible/hosts to include the host ip address.
 
-# Install mysql and clone repository from github
+# Install clone repository from github
 
 ```sh
 ansible-playbook -u admin --private-key ~/.ssh/id_ed25519 app.yml
@@ -20,6 +20,15 @@ _command_: Execute commands on targets
 Command offers you more security (or more so-called, isolation). In other words, your command execution is unaffected by the user's environment variable.
 
 Whereas, shell is very similar to executing commands as yourself on a terminal.
+
+# Set up ssh on github
+
+Copy pub & private keys to github as secrets
+
+```sh
+cat ~/.ssh/github_actions | pbcopy
+cat ~/.ssh/github_actions.pub | pbcopy
+```
 
 - [ ] git clone: file, folder permission, who should git clone?
 - [ ] install various stuff

@@ -1,8 +1,26 @@
 ---
+- name: Generating a new SSH key
+  shell: |
+    ssh-keygen -q -t rsa -b 4096 -f ~/.ssh/github_actions -N ''
+
+- name: Create Deploy User
+  user:
+    name: deploy
+    password: "{{ deploy_password | password_hash('sha512') }}"
+    groups: www-data
+    append: true
+    shell: /bin/bash
+
+- name: Add Deployer Authorized Key
+  authorized_key:
+    user: deploy
+    state: present
+    key: "{{ item }}"
+  with_file:
+    - ~/.ssh/github_actions.pub
+
 - name: Remove home
-  shell: rm -rf www/*
-  args:
-    chdir: /var
+  shell: rm -rf /var/www/*
 
 - name: Clone and set up
   shell: git clone {{ repository }} {{ domain }}
