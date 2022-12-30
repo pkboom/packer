@@ -1,15 +1,15 @@
 # Packer
 
 ```sh
-packer validate cloudcasts.json
+packer validate <packer-file> # or '.'
 
-packer build cloudcasts.json
+packer build <packer-file> # or '.'
 
-packer build -var "infra_env=staging" cloudcasts.json
+packer build -var "infra_env=staging" <packer-file> # or '.'
 
-packer validate -var "infra_env=staging" -var "vault_pass=<vault-pass>" cloudcasts.json
+packer validate -var "infra_env=staging" -var "vault_pass=<vault-pass>" <packer-file> # or '.'
 
-packer build -var "infra_env=staging" -var "vault_pass=<vault-pass>" cloudcasts.json
+packer build -var "infra_env=staging" -var "vault_pass=<vault-pass>" <packer-file> # or' '.
 
 # run the above Ansible provisioner in Packer with
 ANSIBLEPW=`cat .vault` # pass the content of .vault to ANSIBLEPW
@@ -17,15 +17,15 @@ ANSIBLEPW=`cat .vault` # pass the content of .vault to ANSIBLEPW
 packer build \
     -var "infra_env=staging" \
     -var "vault_pass=$ANSIBLEPW" \
-    cloudcasts-app.json
+    <packer-file> # or' '.
 ```
 
 # Managing Servers
 
-Ansible has a default `inventory file` used to define which servers it will be managing.
+Ansible has a default `inventory file` used to define which servers it will manage.
 
 ```sh
-# move (rather than delete) the default one so I can reference it later.
+# move the default one so you can reference it later.
 sudo mv /etc/ansible/hosts /etc/ansible/hosts.orig
 
 code /etc/ansible/hosts
