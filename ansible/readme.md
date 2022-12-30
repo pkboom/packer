@@ -1,3 +1,38 @@
+첨부처 다시 싹 다 해.
+
+# Set up application
+
+## Create ssh keys
+
+> Important: This will be used on the server.
+
+```sh
+ssh-keygen -q -t ed25519 -b 4096 -f id_ed25519 -N '' -C 'admin@experiment.com'
+# -N '': no passphrase
+# -C: comment
+```
+
+## Add server public key to github
+
+> This will be used when git pulling from the server.
+
+```sh
+gh ssh-key add ./id_ed25519.pub --title SSH_SERVER
+```
+
+## Create a deploy user and pull an application
+
+```sh
+ansible-playbook --private-key ./id_ed25519 app.yml -u admin
+```
+
+## Copy keys to deploy user
+
+```sh
+scp ./id_ed25519 deploy@143.198.44.59:~/.ssh/id_ed25519.pub
+scp ./id_ed25519.pub deploy@143.198.44.59:~/.ssh/id_ed25519.pub
+```
+
 > **Note**
 > Edit /etc/ansible/hosts to include the host ip address.
 
