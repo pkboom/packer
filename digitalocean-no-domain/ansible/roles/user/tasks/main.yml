@@ -8,6 +8,9 @@
     password: "{{ admin_password | password_hash('sha512') }}"
     # Defines the primary group for the user
     group: admin
+    groups: www-data # sudo usermod -aG www-data admin
+
+    append: true
     shell: /bin/bash
 
 # https://docs.ansible.com/ansible/latest/collections/ansible/posix/authorized_key_module.html
@@ -18,7 +21,7 @@
     state: present
     key: "{{ item }}"
   with_file:
-    - ./id_ed25519.pub
+    - ~/.ssh/id_ed25519.pub
 
 - name: "Allow admin user to sudo without a password"
   lineinfile:
@@ -26,19 +29,3 @@
     state: "present"
     regexp: "^%admin"
     line: "%admin ALL=(ALL) NOPASSWD: ALL"
-
-- name: Create Deploy User
-  user:
-    name: deploy
-    password: "{{ deploy_password | password_hash('sha512') }}"
-    groups: www-data
-    append: true
-    shell: /bin/bash
-
-- name: Add Deployer Authorized Key
-  authorized_key:
-    user: deploy
-    state: present
-    key: "{{ item }}"
-  with_file:
-    - ./id_ed25519.pub

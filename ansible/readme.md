@@ -1,10 +1,41 @@
-첨부처 다시 싹 다 해.
-
 # Set up application
 
-## Create ssh keys
+1. Add private key as a secret on github actions
 
-> Important: This will be used on the server.
+> This will be used when github actions access the server.
+
+<image width="500" src="secret.png">
+
+1. Add public key to github ssh
+
+> This will be used when git pulling from the server.
+
+> I don't have to do this. Because this key is already in use for my gh.
+
+```sh
+gh ssh-key add ~/.ssh/id_ed25519.pub --title SSH_SERVER
+```
+
+1. copy public key to authorized_keys on server
+
+> I don't have to do this. Because ansible already did this for me.
+
+```sh
+scp ~/.ssh/id_ed25519.pub admin@<server-ip>:~/.ssh/
+
+ssh admin@<server-ip> "
+cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+rm -f ~/.ssh/id_ed25519.pub
+"
+```
+
+## Clone an application from github
+
+```sh
+ansible-playbook --private-key ./id_ed25519 app.yml -u admin
+```
+
+# Create ssh key
 
 ```sh
 ssh-keygen -q -t ed25519 -b 4096 -f id_ed25519 -N '' -C 'admin@experiment.com'
@@ -12,59 +43,11 @@ ssh-keygen -q -t ed25519 -b 4096 -f id_ed25519 -N '' -C 'admin@experiment.com'
 # -C: comment
 ```
 
-## Add server public key to github
+# Remove authorized key
 
-> This will be used when git pulling from the server.
+ssh admin@<server-ip> "
+sed -i '/REGEX_MATCHING_KEY/d' ~/.ssh/authorized_keys
+"
 
-```sh
-gh ssh-key add ./id_ed25519.pub --title SSH_SERVER
-```
-
-## Create a deploy user and pull an application
-
-```sh
-ansible-playbook --private-key ./id_ed25519 app.yml -u admin
-```
-
-## Copy keys to deploy user
-
-```sh
-scp ./id_ed25519 deploy@143.198.44.59:~/.ssh/id_ed25519.pub
-scp ./id_ed25519.pub deploy@143.198.44.59:~/.ssh/id_ed25519.pub
-```
-
-> **Note**
-> Edit /etc/ansible/hosts to include the host ip address.
-
-# Install clone repository from github
-
-```sh
-ansible-playbook -u admin --private-key ~/.ssh/id_ed25519 app.yml
-```
-
-# Difference between shell and command
-
-_shell_: Execute shell commands on targets
-
-> It is almost exactly like the command module but runs the command through a shell (/bin/sh) on the remote node.
-
-_command_: Execute commands on targets
-
-> The command(s) will not be processed through the shell, so variables like $HOME and operations like "<", ">", "|", ";" and "&" will not work. Use the shell module if you need these features.
-
-Command offers you more security (or more so-called, isolation). In other words, your command execution is unaffected by the user's environment variable.
-
-Whereas, shell is very similar to executing commands as yourself on a terminal.
-
-# Set up ssh on github
-
-Copy pub & private keys to github as secrets
-
-```sh
-cat ~/.ssh/github_actions | pbcopy
-cat ~/.ssh/github_actions.pub | pbcopy
-```
-
-- [ ] git clone: file, folder permission, who should git clone?
-- [ ] install various stuff
-- [ ] pull from github
+- [] git clone from github
+- [] run github actions to git pull

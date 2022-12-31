@@ -1,4 +1,8 @@
+# 싹다 다시 봐라
 ---
+- name: Remove existing project
+  shell: rm -rf /var/www/*
+
 - name: Clone and set up
   shell: git clone {{ repository }} {{ domain }}
   args:
