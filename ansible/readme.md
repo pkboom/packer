@@ -51,4 +51,7 @@ sed -i '/REGEX_MATCHING_KEY/d' ~/.ssh/authorized_keys
 
 - [x] git clone from github
 - [ ] configure db in .env
+- [ ] store file in public by www-date
+- [ ] store file in public by command
+- [ ] run to cache route
 - [ ] run github actions to git pull

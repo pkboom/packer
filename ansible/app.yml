@@ -50,26 +50,16 @@
     - debug:
         var: output.stdout_lines
 
-    - name: Configure DB_DATABASE
-      lineinfile:
-        dest: "/var/www/{{ domain }}/.env"
-        state: "present"
-        regexp: "^DB_DATABASE"
-        line: "DB_DATABASE={{ db_name }}"
-
-    - name: Configure DB_USERNAME
-      lineinfile:
-        dest: "/var/www/{{ domain }}/.env"
-        state: "present"
-        regexp: "^DB_USERNAME"
-        line: "DB_USERNAME={{ db_user }}"
-
     - name: Configure DB_PASSWORD
       lineinfile:
         dest: "/var/www/{{ domain }}/.env"
         state: "present"
-        regexp: "^DB_PASSWORD"
-        line: "DB_PASSWORD={{ db_password }}"
+        regexp: "^{{ item.name }}"
+        line: "{{ item.name }}={{ item.value }}"
+      loop:
+        - { name: "DB_DATABASE", value: "{{ db_name }}" }
+        - { name: "DB_USERNAME", value: "{{ db_user }}" }
+        - { name: "DB_PASSWORD", value: "{{ db_password }}" }
 
     - name: Migrate
       command: php artisan migrate
