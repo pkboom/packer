@@ -5,6 +5,9 @@
   vars:
     - domain: experiment.com
     - repo: https://github.com/pkboom/experiment.git
+    - db_name: experiment
+    - db_user: admin
+    - db_password: asdfasdf
 
   tasks:
     - name: Delete existing project
@@ -26,19 +29,10 @@
         group: www-data
         mode: u=rwX,g=rwX,o=rX
 
-    - name: "Add nodejs apt key"
-      become: true
-      become_user: admin
-      apt_key:
-        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-        state: present
-
     - name: Install nodejs
       shell: |
-        curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash - 
-        sudo apt-get install -y nodejs npm
-      args:
-        chdir: /var/www/{{ domain }}
+        curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash -
+        sudo apt-get install -y nodejs
 
     - name: Install packages
       become: true
@@ -56,10 +50,30 @@
     - debug:
         var: output.stdout_lines
 
-    # define db password, and path in .env
-    # - name: Set up db
-    #   shell: |
-    #     copy '.env.example' '.env'
-    #   args:
-    #     chdir: /var/www/{{ domain }}
-    #   register: command_output
+    - name: Configure DB_DATABASE
+      lineinfile:
+        dest: "/var/www/{{ domain }}/.env"
+        state: "present"
+        regexp: "^DB_DATABASE"
+        line: "DB_DATABASE={{ db_name }}"
+
+    - name: Configure DB_USERNAME
+      lineinfile:
+        dest: "/var/www/{{ domain }}/.env"
+        state: "present"
+        regexp: "^DB_USERNAME"
+        line: "DB_USERNAME={{ db_user }}"
+
+    - name: Configure DB_PASSWORD
+      lineinfile:
+        dest: "/var/www/{{ domain }}/.env"
+        state: "present"
+        regexp: "^DB_PASSWORD"
+        line: "DB_PASSWORD={{ db_password }}"
+
+    - name: Migrate
+      command: php artisan migrate
+      args:
+        chdir: "/var/www/{{ domain }}"
+      with_items:
+        - php artisan migrate

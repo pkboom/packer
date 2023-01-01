@@ -49,5 +49,6 @@ ssh admin@<server-ip> "
 sed -i '/REGEX_MATCHING_KEY/d' ~/.ssh/authorized_keys
 "
 
-- [] git clone from github
-- [] run github actions to git pull
+- [x] git clone from github
+- [ ] configure db in .env
+- [ ] run github actions to git pull
