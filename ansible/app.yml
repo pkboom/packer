@@ -1,6 +1,65 @@
 ---
-- hosts: all
+- name: Set up application
+  hosts: all
   become: yes
-  roles:
-    - github
-    # - mysql
+  vars:
+    - domain: experiment.com
+    - repo: https://github.com/pkboom/experiment.git
+
+  tasks:
+    - name: Delete existing project
+      file:
+        state: absent
+        path: /var/www
+
+    - name: Clone
+      git:
+        repo: "{{ repo }}"
+        dest: /var/www/{{ domain }}
+
+    - name: Recursively change ownership of directoris and files
+      file:
+        path: /var/www/{{ domain }}
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+        mode: u=rwX,g=rwX,o=rX
+
+    - name: "Add nodejs apt key"
+      become: true
+      become_user: admin
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+
+    - name: Install nodejs
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash - 
+        sudo apt-get install -y nodejs npm
+      args:
+        chdir: /var/www/{{ domain }}
+
+    - name: Install packages
+      become: true
+      become_user: admin
+      shell: |
+        cp '.env.example' '.env'
+        composer install
+        php artisan key:generate
+        npm install
+        npm run build
+      args:
+        chdir: /var/www/{{ domain }}
+      register: output
+
+    - debug:
+        var: output.stdout_lines
+
+    # define db password, and path in .env
+    # - name: Set up db
+    #   shell: |
+    #     copy '.env.example' '.env'
+    #   args:
+    #     chdir: /var/www/{{ domain }}
+    #   register: command_output

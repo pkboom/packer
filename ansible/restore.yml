@@ -1,0 +1,38 @@
+---
+- name: Set up application
+  hosts: all
+  become: yes
+  vars:
+    - domain: experiment.com
+
+  tasks:
+    - name: Delete existing project
+      file:
+        state: absent
+        path: /var/www
+
+    - name: remove deb key
+      file:
+        state: absent
+        path: /etc/apt/sources.list.d/deb_nodesource_com_node_19_x.list
+
+    - name: Ensure app dir exists
+      file:
+        path: "/var/www/{{ domain }}"
+        state: directory
+        owner: www-data
+        group: www-data
+
+    - name: Ensure web root exists
+      file:
+        path: "/var/www/{{ domain }}/public"
+        state: directory
+        owner: www-data
+        group: www-data
+
+    - name: Add PHP file
+      copy:
+        src: index.php
+        dest: "/var/www/{{ domain }}/public/index.php"
+        owner: www-data
+        group: www-data

@@ -1,4 +1,3 @@
-# 싹다 다시 봐라
 ---
 - name: Remove existing project
   shell: rm -rf /var/www/*
@@ -7,6 +6,11 @@
   shell: git clone {{ repository }} {{ domain }}
   args:
     chdir: /var/www
+
+- name: File permissions
+  shell: |
+    sudo find /var/www/your-project-path -type f -exec chmod 664 {} \;
+    sudo find /var/www/your-project-path -type d -exec chmod 755 {} \;
 
 - name: Clone and set up
   shell: |
@@ -21,31 +25,30 @@
 
 - debug:
     var: command_output.stdout_lines
+# - name: Configure DB_DATABASE
+#   lineinfile:
+#     dest: "/var/www/{{ domain }}/.env"
+#     state: "present"
+#     regexp: "^DB_DATABASE"
+#     line: "DB_DATABASE={{ db_name }}"
 
-- name: Configure DB_DATABASE
-  lineinfile:
-    dest: "/var/www/{{ domain }}/.env"
-    state: "present"
-    regexp: "^DB_DATABASE"
-    line: "DB_DATABASE={{ db_name }}"
+# - name: Configure DB_USERNAME
+#   lineinfile:
+#     dest: "/var/www/{{ domain }}/.env"
+#     state: "present"
+#     regexp: "^DB_USERNAME"
+#     line: "DB_USERNAME={{ db_user }}"
 
-- name: Configure DB_USERNAME
-  lineinfile:
-    dest: "/var/www/{{ domain }}/.env"
-    state: "present"
-    regexp: "^DB_USERNAME"
-    line: "DB_USERNAME={{ db_user }}"
+# - name: Configure db
+#   lineinfile:
+#     dest: "/var/www/{{ domain }}/.env"
+#     state: "present"
+#     regexp: "^DB_PASSWORD"
+#     line: "DB_PASSWORD={{ db_password }}"
 
-- name: Configure db
-  lineinfile:
-    dest: "/var/www/{{ domain }}/.env"
-    state: "present"
-    regexp: "^DB_PASSWORD"
-    line: "DB_PASSWORD={{ db_password }}"
-
-- name: Migrate
-  command: "{{ item }}"
-  args:
-    chdir: "/var/www/{{ domain }}"
-  with_items:
-    - php artisan migrate
+# - name: Migrate
+#   command: "{{ item }}"
+#   args:
+#     chdir: "/var/www/{{ domain }}"
+#   with_items:
+#     - php artisan migrate
