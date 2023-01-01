@@ -8,6 +8,7 @@
     - db_name: experiment
     - db_user: admin
     - db_password: asdfasdf
+    - php_version: 8.2
 
   tasks:
     - name: Delete existing project
@@ -50,6 +51,11 @@
     - debug:
         var: output.stdout_lines
 
+    - name: Restart PHP-FPM
+      service:
+        name: "php{{ php_version }}-fpm"
+        state: restarted
+
     - name: Configure DB_PASSWORD
       lineinfile:
         dest: "/var/www/{{ domain }}/.env"
@@ -62,8 +68,8 @@
         - { name: "DB_PASSWORD", value: "{{ db_password }}" }
 
     - name: Migrate
+      become: true
+      become_user: admin
       command: php artisan migrate
       args:
         chdir: "/var/www/{{ domain }}"
-      with_items:
-        - php artisan migrate
