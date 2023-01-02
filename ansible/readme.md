@@ -72,5 +72,5 @@ sed -i '/REGEX_MATCHING_KEY/d' ~/.ssh/authorized_keys
 ],
 ```
 
-- [ ] run github actions to git pull
+- [x] run github actions to git pull
 - [ ] use different keys. not mine.
