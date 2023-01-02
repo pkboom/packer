@@ -4,7 +4,7 @@
   become: yes
   vars:
     - domain: experiment.com
-    - repo: https://github.com/pkboom/experiment.git
+    - repo: git@github.com:pkboom/experiment.git
     - db_name: experiment
     - db_user: admin
     - db_password: asdfasdf
@@ -16,11 +16,25 @@
         state: absent
         path: /var/www
 
+    - name: Create www dir
+      file:
+        path: /var/www
+        state: directory
+        owner: admin
+        group: admin
+        mode: 0775
+
     - name: Clone
+      become: true
+      become_user: admin
       git:
         repo: "{{ repo }}"
         dest: /var/www/{{ domain }}
         depth: 1
+        single_branch: yes
+        version: master
+        accept_hostkey: true
+        # key_file: ~/.ssh/id_ed25519
 
     - name: Fix unsafe repository
       become: true
