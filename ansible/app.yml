@@ -20,6 +20,12 @@
       git:
         repo: "{{ repo }}"
         dest: /var/www/{{ domain }}
+        depth: 1
+
+    - name: Fix unsafe repository
+      become: true
+      become_user: admin
+      command: git config --global --add safe.directory /var/www/{{ domain }}
 
     - name: Recursively change ownership of directoris and files
       file:
