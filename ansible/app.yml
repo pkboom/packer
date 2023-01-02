@@ -12,34 +12,14 @@
 
   tasks:
     - name: Delete existing project
-      file:
-        state: absent
-        path: /var/www
-
-    - name: Create www dir
-      file:
-        path: /var/www
-        state: directory
-        owner: admin
-        group: admin
-        mode: 0775
+      command: rm -rf /var/www/{{ domain }}
 
     - name: Clone
       become: true
       become_user: admin
-      git:
-        repo: "{{ repo }}"
-        dest: /var/www/{{ domain }}
-        depth: 1
-        single_branch: yes
-        version: master
-        accept_hostkey: true
-        # key_file: ~/.ssh/id_ed25519
-
-    - name: Fix unsafe repository
-      become: true
-      become_user: admin
-      command: git config --global --add safe.directory /var/www/{{ domain }}
+      command: git clone --depth 1 {{ repo }} {{ domain }}
+      args:
+        chdir: /var/www
 
     - name: Recursively change ownership of directoris and files
       file:
@@ -49,6 +29,10 @@
         owner: www-data
         group: www-data
         mode: u=rwX,g=rwX,o=rX
+
+    # This repository is owned by admin. Must not change the owner.
+    - name: Change permissions and ownership
+      command: chown "admin":"admin" /var/www/{{ domain }}
 
     - name: Create .env
       become: true
