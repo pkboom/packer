@@ -2,6 +2,10 @@
 
 - Add private key as a secret on github actions
 
+```sh
+cat ~/.ssh/id_ed25519 | pbcopy
+```
+
 > This will be used when github actions access the server.
 
 <image width="500" src="secret.png">
@@ -27,6 +31,12 @@ ssh admin@<server-ip> "
 cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
 rm -f ~/.ssh/id_ed25519.pub
 "
+```
+
+- Copy private key to server
+
+```sh
+scp ~/.ssh/id_ed25519 admin@<server-ip>:~/.ssh/
 ```
 
 ## Clone an application from github
@@ -72,5 +82,4 @@ sed -i '/REGEX_MATCHING_KEY/d' ~/.ssh/authorized_keys
 ],
 ```
 
-- [x] run github actions to git pull
 - [ ] use different keys. not mine.
