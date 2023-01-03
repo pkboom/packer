@@ -14,6 +14,11 @@
     - name: Delete existing project
       command: rm -rf /var/www/{{ domain }}
 
+    - name: Add github to known_hosts
+      become: true
+      become_user: admin
+      shell: ssh-keyscan github.com >> ~/.ssh/known_hosts
+
     - name: Clone
       become: true
       become_user: admin
