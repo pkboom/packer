@@ -68,5 +68,3 @@ sed -i '/REGEX_MATCHING_KEY/d' ~/.ssh/authorized_keys
     ],
 ],
 ```
-
-- [ ] use different keys. not mine.
