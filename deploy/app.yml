@@ -1,0 +1,141 @@
+---
+- name: Set up application
+  hosts: all
+  vars:
+    - domain: experiment.com
+    - repo: git@github.com:pkboom/experiment.git
+    - db_name: experiment
+    - db_user: admin
+    - db_password: asdfasdf
+    - deploy_password: asdfasdf
+    - php_version: 8.2
+
+  tasks:
+    - name: Create deploy user
+      become: yes
+      user:
+        name: deploy
+        group: www-data
+        groups: sudo
+        append: true
+        shell: /bin/bash
+
+    - name: Add Deployer Authorized Key
+      become: true
+      authorized_key:
+        user: deploy
+        state: present
+        key: "{{ item }}"
+      with_file:
+        - ~/.ssh/deploy.pub
+
+    - name: Copy deploy private to server
+      remote_user: deploy
+      copy:
+        src: ~/.ssh/deploy
+        dest: ~/.ssh/id_ed25519
+        mode: 0600
+
+    - name: Copy deploy public to server
+      remote_user: deploy
+      copy:
+        src: ~/.ssh/deploy.pub
+        dest: ~/.ssh/id_ed25519.pub
+        mode: 0644
+
+    - name: Add github to known_hosts
+      remote_user: deploy
+      shell: |
+        ssh-keyscan github.com >> /home/deploy/.ssh/known_hosts
+        chmod 600 /home/deploy/.ssh/known_hosts
+
+    # - name: Add public to authorized_keys
+    #   become: true
+    #   become_user: deploy
+    #   shell: |
+    #     cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+    #     chmod 600 ~/.ssh/authorized_keys
+
+    - name: Delete existing project
+      become: true
+      command: rm -rf /var/www/{{ domain }}
+
+    - name: Change ownership and permission of www
+      become: true
+      file:
+        path: /var/www
+        state: directory
+        owner: deploy
+        group: www-data
+        mode: u=rwX,g=rwX,o=rX
+
+    - name: Clone
+      remote_user: deploy
+      command: git clone --depth 1 {{ repo }} {{ domain }}
+      args:
+        chdir: /var/www
+
+    # - name: Recursively change ownership of directoris and files
+    #   file:
+    #     path: /var/www/{{ domain }}
+    #     state: directory
+    #     recurse: yes
+    #     owner: www-data
+    #     group: www-data
+    #     mode: u=rwX,g=rwX,o=rX
+
+    # This repository is owned by admin.
+    # - name: Change permissions and ownership
+    #   command: chown "deploy":"deploy" /var/www/{{ domain }}
+
+    # - name: Create .env
+    #   become: true
+    #   become_user: admin
+    #   shell: cp '.env.example' '.env'
+    #   args:
+    #     chdir: /var/www/{{ domain }}
+
+    # - name: Configure DB_PASSWORD
+    #   become: true
+    #   become_user: admin
+    #   lineinfile:
+    #     dest: "/var/www/{{ domain }}/.env"
+    #     state: "present"
+    #     regexp: "^{{ item.name }}"
+    #     line: "{{ item.name }}={{ item.value }}"
+    #   loop:
+    #     - { name: "DB_DATABASE", value: "{{ db_name }}" }
+    #     - { name: "DB_USERNAME", value: "{{ db_user }}" }
+    #     - { name: "DB_PASSWORD", value: "{{ db_password }}" }
+
+    # - name: Install nodejs
+    #   shell: |
+    #     curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash -
+    #     sudo apt-get install -y nodejs
+
+    # - name: Install packages
+    #   become: true
+    #   become_user: admin
+    #   shell: |
+    #     composer install
+    #     php artisan key:generate
+    #     npm install
+    #     npm run build
+    #   args:
+    #     chdir: /var/www/{{ domain }}
+    #   register: output
+
+    # - debug:
+    #     var: output.stdout_lines
+
+    # - name: Migrate
+    #   become: true
+    #   become_user: admin
+    #   command: php artisan migrate
+    #   args:
+    #     chdir: "/var/www/{{ domain }}"
+
+    # - name: Restart PHP-FPM
+    #   service:
+    #     name: "php{{ php_version }}-fpm"
+    #     state: restarted
