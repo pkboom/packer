@@ -8,9 +8,6 @@
     password: "{{ admin_password | password_hash('sha512') }}"
     # Defines the primary group for the user
     group: admin
-    groups: www-data # sudo usermod -aG www-data admin
-
-    append: true
     shell: /bin/bash
 
 # https://docs.ansible.com/ansible/latest/collections/ansible/posix/authorized_key_module.html
