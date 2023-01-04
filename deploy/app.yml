@@ -46,8 +46,8 @@
     - name: Add github to known_hosts
       remote_user: deploy
       shell: |
-        ssh-keyscan github.com >> /home/deploy/.ssh/known_hosts
-        chmod 600 /home/deploy/.ssh/known_hosts
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts
 
     # - name: Add public to authorized_keys
     #   become: true
@@ -75,67 +75,62 @@
       args:
         chdir: /var/www
 
-    # - name: Recursively change ownership of directoris and files
-    #   file:
-    #     path: /var/www/{{ domain }}
-    #     state: directory
-    #     recurse: yes
-    #     owner: www-data
-    #     group: www-data
-    #     mode: u=rwX,g=rwX,o=rX
+    - name: Recursively change ownership of directoris and files
+      become: true
+      file:
+        path: /var/www/{{ domain }}
+        state: directory
+        recurse: yes
+        owner: deploy
+        group: www-data
+        mode: u=rwX,g=rwX,o=rX
 
-    # This repository is owned by admin.
-    # - name: Change permissions and ownership
-    #   command: chown "deploy":"deploy" /var/www/{{ domain }}
+    - name: Create .env
+      remote_user: deploy
+      shell: cp '.env.example' '.env'
+      args:
+        chdir: /var/www/{{ domain }}
 
-    # - name: Create .env
-    #   become: true
-    #   become_user: admin
-    #   shell: cp '.env.example' '.env'
-    #   args:
-    #     chdir: /var/www/{{ domain }}
+    - name: Configure DB_PASSWORD
+      remote_user: deploy
+      lineinfile:
+        dest: "/var/www/{{ domain }}/.env"
+        state: "present"
+        regexp: "^{{ item.name }}"
+        line: "{{ item.name }}={{ item.value }}"
+      loop:
+        - { name: "DB_DATABASE", value: "{{ db_name }}" }
+        - { name: "DB_USERNAME", value: "{{ db_user }}" }
+        - { name: "DB_PASSWORD", value: "{{ db_password }}" }
 
-    # - name: Configure DB_PASSWORD
-    #   become: true
-    #   become_user: admin
-    #   lineinfile:
-    #     dest: "/var/www/{{ domain }}/.env"
-    #     state: "present"
-    #     regexp: "^{{ item.name }}"
-    #     line: "{{ item.name }}={{ item.value }}"
-    #   loop:
-    #     - { name: "DB_DATABASE", value: "{{ db_name }}" }
-    #     - { name: "DB_USERNAME", value: "{{ db_user }}" }
-    #     - { name: "DB_PASSWORD", value: "{{ db_password }}" }
+    - name: Install nodejs
+      remote_user: deploy
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash -
+        sudo apt-get install -y nodejs
 
-    # - name: Install nodejs
-    #   shell: |
-    #     curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash -
-    #     sudo apt-get install -y nodejs
+    - name: Install packages
+      remote_user: deploy
+      shell: |
+        composer install
+        php artisan key:generate
+        npm install
+        npm run build
+      args:
+        chdir: /var/www/{{ domain }}
+      register: output
 
-    # - name: Install packages
-    #   become: true
-    #   become_user: admin
-    #   shell: |
-    #     composer install
-    #     php artisan key:generate
-    #     npm install
-    #     npm run build
-    #   args:
-    #     chdir: /var/www/{{ domain }}
-    #   register: output
+    - debug:
+        var: output.stdout_lines
 
-    # - debug:
-    #     var: output.stdout_lines
+    - name: Migrate
+      remote_user: deploy
+      command: php artisan migrate
+      args:
+        chdir: "/var/www/{{ domain }}"
 
-    # - name: Migrate
-    #   become: true
-    #   become_user: admin
-    #   command: php artisan migrate
-    #   args:
-    #     chdir: "/var/www/{{ domain }}"
-
-    # - name: Restart PHP-FPM
-    #   service:
-    #     name: "php{{ php_version }}-fpm"
-    #     state: restarted
+    - name: Restart PHP-FPM
+      become: true
+      service:
+        name: "php{{ php_version }}-fpm"
+        state: restarted
