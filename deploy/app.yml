@@ -20,14 +20,30 @@
         append: true
         shell: /bin/bash
 
-    - name: Add Deployer Authorized Key
+    - name: Add deploy user to the sudoers
+      become: true
+      copy:
+        dest: "/etc/sudoers.d/deploy"
+        content: "deploy ALL=(ALL) NOPASSWD: ALL"
+
+    - name: Add deployer to authorized_key
       become: true
       authorized_key:
         user: deploy
         state: present
-        key: "{{ item }}"
-      with_file:
-        - ~/.ssh/deploy.pub
+        key: "{{ lookup('file', '~/.ssh/deploy.pub') }}"
+      notify:
+        - restart ssh
+
+    - name: creating db
+      become: true
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+
+    - name: Pause to let sshd restart
+      pause:
+        seconds: 30
 
     - name: Copy deploy private to server
       remote_user: deploy
@@ -49,16 +65,9 @@
         ssh-keyscan github.com >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts
 
-    # - name: Add public to authorized_keys
-    #   become: true
-    #   become_user: deploy
-    #   shell: |
-    #     cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
-    #     chmod 600 ~/.ssh/authorized_keys
-
     - name: Delete existing project
       become: true
-      command: rm -rf /var/www/{{ domain }}
+      command: rm -rf /var/www
 
     - name: Change ownership and permission of www
       become: true
@@ -91,7 +100,7 @@
       args:
         chdir: /var/www/{{ domain }}
 
-    - name: Configure DB_PASSWORD
+    - name: Configure DB
       remote_user: deploy
       lineinfile:
         dest: "/var/www/{{ domain }}/.env"
@@ -104,7 +113,7 @@
         - { name: "DB_PASSWORD", value: "{{ db_password }}" }
 
     - name: Install nodejs
-      remote_user: deploy
+      become: true
       shell: |
         curl -fsSL https://deb.nodesource.com/setup_19.x | sudo -E bash -
         sudo apt-get install -y nodejs
@@ -129,8 +138,13 @@
       args:
         chdir: "/var/www/{{ domain }}"
 
-    - name: Restart PHP-FPM
-      become: true
+  handlers:
+    - name: restart ssh
       service:
-        name: "php{{ php_version }}-fpm"
+        name: ssh
+        state: restarted
+
+    - name: restart mysql
+      service:
+        name: mysql
         state: restarted

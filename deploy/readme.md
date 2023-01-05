@@ -1,3 +1,10 @@
+# Add a server to inventory
+
+```sh
+# /etc/ansible/hosts
+<host-ip>
+```
+
 # Create deploy keys
 
 > This is done only one time for all servers.
@@ -37,6 +44,8 @@ gh secret set SSH_PRIVATE < ~/.ssh/deploy
 ## Clone an application onto server
 
 ```sh
+ansible-playbook -u admin app.yml
+
 ansible-playbook --private-key ~/.ssh/deploy -u deploy app.yml
 ```
 
