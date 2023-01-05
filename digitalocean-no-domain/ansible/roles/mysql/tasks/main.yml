@@ -29,39 +29,25 @@
     mode: 0600
 
 # mysql_secure_installation down from here
-- name: Sets the root password
+- name: Secures the MySQL root user for localhost domain (localhost)
   mysql_user:
     user: root
     password: "{{ mysql_root_password }}"
     host: localhost
   no_log: yes
 
-- name: Secures the MySQL root user for localhost domain (localhost)
-  mysql_user:
-    user: "root"
-    password: "{{ mysql_root_password }}"
-    state: present
-  no_log: yes
-
 - name: Secures the MySQL root user for IPV6 localhost (::1)
   mysql_user:
-    user: "root"
+    user: root
     password: "{{ mysql_root_password }}"
     host: "::1"
   no_log: yes
 
 - name: Secures the MySQL root user for IPV4 localhost (127.0.0.1)
   mysql_user:
-    user: "root"
+    user: root
     password: "{{ mysql_root_password }}"
-    host: "127.0.0.1"
-  no_log: yes
-
-- name: Secures the MySQL root user for localhost domain (localhost)
-  mysql_user:
-    user: "root"
-    password: "{{ mysql_root_password }}"
-    host: "localhost"
+    host: 127.0.0.1
   no_log: yes
 
 - name: Deletes anonymous MySQL user
@@ -81,6 +67,13 @@
     priv: "*.*:ALL"
     host: "%"
     state: present
+  no_log: yes
+
+- name: Secures the MySQL root user for localhost domain (localhost)
+  mysql_user:
+    user: "{{ db_user }}"
+    password: "{{ db_password }}"
+    host: 127.0.0.1
   no_log: yes
 
 - name: creating db
