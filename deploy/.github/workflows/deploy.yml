@@ -1,0 +1,148 @@
+name: Test & Deploy
+
+on:
+  push:
+    brances:
+      - master
+
+jobs:
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    env:
+      php: 8.2
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: test
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # - name: Cache npm dependencies
+      #   id: cache-node_modules
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: node_modules
+      #     key: npm-${{ hashFiles('package-lock.json') }}
+
+      # - name: Install front-end dependencies
+      #   if: steps.cache-node_modules.outputs.cache-hit != 'true'
+      #   run: npm install
+
+      # - name: Compile front-end
+      #   run: npm install && npm run build
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
+
+      - name: Cache composer dependencies
+        id: cache-vendor
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: composer-${{ env.php }}-${{ hashFiles('composer.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-vendor.outputs.cache-hit != 'true'
+        run: composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-scripts
+
+      - name: Prepare Laravel Application
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit
+        env:
+          DB_DATABASE: test
+          DB_USER: root
+          DB_PASSWORD: password
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: tests
+    env:
+      repository: pkboom/experiment
+      host: 143.110.217.95
+      # host: 'experiment.com'
+      username: admin
+      baseDir: /var/www/experiment.com
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Git pull
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.host }}
+          username: ${{ env.username }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+            cd ${{ env.baseDir }}
+            git pull origin master
+
+      - name: Composer update
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.host }}
+          username: ${{ env.username }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+            cd ${{ env.baseDir }}
+            composer update --prefer-dist --no-interaction --no-scripts;
+
+      - name: Generate assets
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.host }}
+          username: ${{ env.username }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+            cd ${{ env.baseDir }}
+            npm ci
+            npm run build
+            rm -rf node_modules
+            php artisan clear-compiled
+
+      - name: Migrate
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.host }}
+          username: ${{ env.username }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+            cd ${{ env.baseDir }}
+            php artisan migrate --force
+
+      - name: Cache
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.host }}
+          username: ${{ env.username }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+            cd ${{ env.baseDir }}
+            php artisan config:clear
+            php artisan view:clear
+            php artisan cache:clear
+            php artisan config:cache
+
+      - name: Restart php-fpm
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.host }}
+          username: ${{ env.username }}
+          key: ${{ secrets.SSH_PRIVATE }}
+          script: |
+            sudo service php8.2-fpm restart
